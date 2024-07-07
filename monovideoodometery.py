@@ -11,20 +11,7 @@ class MonoVideoOdometery(object):
                 pp = (607.1928, 185.2157), 
                 lk_params=dict(winSize  = (21,21), criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 30, 0.01)), 
                 detector=cv2.FastFeatureDetector_create(threshold=25, nonmaxSuppression=True)):
-        '''
-        Arguments:
-            img_file_path {str} -- File path that leads to image sequences
-            pose_file_path {str} -- File path that leads to true poses from image sequence
         
-        Keyword Arguments:
-            focal_length {float} -- Focal length of camera used in image sequence (default: {718.8560})
-            pp {tuple} -- Principal point of camera in image sequence (default: {(607.1928, 185.2157)})
-            lk_params {dict} -- Parameters for Lucas Kanade optical flow (default: {dict(winSize  = (21,21), criteria = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 30, 0.01))})
-            detector {cv2.FeatureDetector} -- Most types of OpenCV feature detectors (default: {cv2.FastFeatureDetector_create(threshold=25, nonmaxSuppression=True)})
-        
-        Raises:
-            ValueError -- Raised when file either file paths are not correct, or img_file_path is not configured correctly
-        '''
 
         self.file_path = img_file_path
         self.detector = detector
@@ -66,16 +53,7 @@ class MonoVideoOdometery(object):
 
 
     def detect(self, img):
-        '''Used to detect features and parse into useable format
 
-        
-        Arguments:
-            img {np.ndarray} -- Image for which to detect keypoints on
-        
-        Returns:
-            np.array -- A sequence of points in (x, y) coordinate format
-            denoting location of detected keypoint
-        '''
 
         p0 = self.detector.detect(img)
         
@@ -103,8 +81,6 @@ class MonoVideoOdometery(object):
         self.good_new = self.p1[st == 1]
 
 
-        # If the frame is one of first two, we need to initalize
-        # our t and R vectors so behavior is different
         """
         if self.id < 2:
             E, _ = cv2.findEssentialMat(self.good_new, self.good_old, self.focal, self.pp, cv2.RANSAC, 0.999, 1.0, None)
@@ -148,21 +124,12 @@ class MonoVideoOdometery(object):
 
 
     def get_true_coordinates(self):
-        '''Returns true coordinates of vehicle
-        
-        Returns:
-            np.array -- Array in format [x, y, z]
-        '''
+
         return self.true_coord.flatten()
 
 
     def get_absolute_scale(self):
-        '''Used to provide scale estimation for mutliplying
-           translation vectors
-        
-        Returns:
-            float -- Scalar value allowing for scale estimation
-        '''
+
         pose = self.pose[self.id - 1].strip().split()
         x_prev = float(pose[3])
         y_prev = float(pose[7])
@@ -180,8 +147,7 @@ class MonoVideoOdometery(object):
 
 
     def process_frame(self):
-        '''Processes images in sequence frame by frame
-        '''
+
 
         if self.id < 2:
             self.old_frame = cv2.imread(self.file_path +str().zfill(6)+'.png', 0)
